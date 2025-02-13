@@ -1,0 +1,2 @@
+gcc -g -Wall pwent.c login_linux.c -lcrypt -o login_linux
+./login_linux
