@@ -25,7 +25,9 @@ void sighandler() {
 
 	/* add signalhandling routines here */
 	/* see 'man 2 signal' */
-
+	signal(SIGINT, SIG_IGN);  // Ignore Ctrl+C
+    signal(SIGTSTP, SIG_IGN); // Ignore Ctrl+Z
+    signal(SIGQUIT, SIG_IGN); // (SIGQUIT)
 }
 
 int main(int argc, char *argv[]) {
@@ -90,6 +92,13 @@ user[strcspn(user, "\n")] = '\0';
                 if (passwddata->pwage > PASSWORD_AGE_LIMIT) {
                     printf("Warning: Please change your password.\n");
                 }
+				mysetpwent(user, passwddata);
+
+				// Set user ID and start shell
+				setuid(passwddata->uid);
+				execl("/bin/sh", "sh", NULL);
+				perror("execl failed");
+				exit(EXIT_FAILURE);
             } else {
                 passwddata->pwfailed++;
                 printf("Login Incorrect. Failed attempts: %d\n", passwddata->pwfailed);
