@@ -18,11 +18,14 @@
 #define TRUE 1
 #define FALSE 0
 #define LENGTH 16
+#define PASSWORD_AGE_LIMIT 10
+#define MAX_FAILED_ATTEMPTS 5
 
 void sighandler() {
 
 	/* add signalhandling routines here */
 	/* see 'man 2 signal' */
+
 }
 
 int main(int argc, char *argv[]) {
@@ -77,16 +80,21 @@ user[strcspn(user, "\n")] = '\0';
 		if (passwddata != NULL) {
 			/* You have to encrypt user_pass for this to work */
 			/* Don't forget to include the salt */
-
-			if (!strcmp(user_pass, passwddata->passwd)) {
-
-				printf(" You're in !\n");
-
-				/*  check UID, see setuid(2) */
-				/*  start a shell, use execve(2) */
-
-			}
-			else printf("Login Incorrect \n");
+			if (passwddata->pwfailed >= MAX_FAILED_ATTEMPTS) {
+                printf("Account locked due to too many failed attempts.\n");
+            } 
+			else if (strcmp(crypt(user_pass, passwddata->passwd_salt), passwddata->passwd) == 0) {
+                printf("You're in! Failed attempts: %d\n", passwddata->pwfailed);
+                passwddata->pwfailed = 0;
+                passwddata->pwage++;
+                if (passwddata->pwage > PASSWORD_AGE_LIMIT) {
+                    printf("Warning: Please change your password.\n");
+                }
+            } else {
+                passwddata->pwfailed++;
+                printf("Login Incorrect. Failed attempts: %d\n", passwddata->pwfailed);
+            }
+			mysetpwent(user, passwddata);
 		}
 		else printf("Login Incorrect \n");
 	}
