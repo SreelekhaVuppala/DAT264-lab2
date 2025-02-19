@@ -95,10 +95,15 @@ user[strcspn(user, "\n")] = '\0';
 				mysetpwent(user, passwddata);
 
 				// Set user ID and start shell
-				setuid(passwddata->uid);
+				int ret = setuid(passwddata->uid);
+				if(ret == 0){
 				execl("/bin/sh", "sh", NULL);
 				perror("execl failed");
 				exit(EXIT_FAILURE);
+				} else {
+					printf("Incorrect user ID\n");
+					exit(0);
+				}
             } else {
                 passwddata->pwfailed++;
                 printf("Login Incorrect. Failed attempts: %d\n", passwddata->pwfailed);

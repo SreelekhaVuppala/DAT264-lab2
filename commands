@@ -4,3 +4,4 @@ gcc -g -Wall pwent.c login_linux.c -lcrypt -o login_linux
 To generate new password:
 gcc -o makepass makepass.c -lcrypt
 makepass 'salt'
+./makepass 'sa'
